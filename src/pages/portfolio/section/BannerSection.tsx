@@ -13,7 +13,7 @@ const BannerSection = () => {
             >
                 <TitleText variants={itemVariants}>
                     사회 문제의 기술적 솔루션을 설계하고 <br />
-                    앱웹 서비스로 구현하며 사람들의 일상 속에 자연스럽게 녹여냅니다.
+                    웹앱 서비스로 구현하며 사람들의 일상 속에 자연스럽게 녹여냅니다.
                 </TitleText>
 
                 <ScrollGuide variants={itemVariants}>

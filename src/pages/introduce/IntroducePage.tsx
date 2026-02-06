@@ -278,6 +278,7 @@ const TopBarButton = styled.div<{select?: boolean}>`
     font-weight: 600;
     line-height: normal;
     overflow: hidden;
+    cursor: pointer;
 `;
 const LogoWrapper = styled.div`
     z-index: 1;
