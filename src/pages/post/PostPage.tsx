@@ -1,9 +1,10 @@
 import { useEffect, useState } from "react";
 import { Link, useParams } from "react-router-dom";
 import styled from "styled-components";
-import Header from "../../components/Header.tsx";
 import MarkdownView from "../../components/MarkdownView.tsx";
-import { findPost } from "../portfolio/data/projects.ts";
+import { findPost } from "../../data/projects.ts";
+import { portfolioState } from "../portfolio/portfolioState.ts";
+import { formatDate } from "../../utils/format.ts";
 import { media } from "../../styles/media.ts";
 
 // 글 본문은 글마다 따로 불러옴 (메인 번들에 포함되지 않음)
@@ -12,7 +13,6 @@ const postBodies = import.meta.glob<string>("../../content/posts/*.md", { query:
 const PostPage = () => {
     const { slug = "" } = useParams();
     const found = findPost(slug);
-    const [headerHeight, setHeaderHeight] = useState(0);
     const [loaded, setLoaded] = useState<{ slug: string; text: string } | null>(null);
     const loader = postBodies[`../../content/posts/${slug}.md`];
     // 본문 파일이 없으면 빈 글, 불러오는 중이면 null
@@ -36,8 +36,7 @@ const PostPage = () => {
 
     return (
         <Page>
-            <Header onHeightChange={setHeaderHeight} />
-            <Main $paddingTop={headerHeight}>
+            <Main>
                 {!found
                     ? (
                         <NotFound>
@@ -47,12 +46,12 @@ const PostPage = () => {
                     )
                     : (
                         <>
-                            <BackLink to="/portfolio" state={{ openProject: found.project.id, view: "posts" }}>
+                            <BackLink to="/portfolio" state={portfolioState(found.project.id, "posts")}>
                                 ← {found.project.title}
                             </BackLink>
                             <PostHeader>
                                 <Title>{found.post.title}</Title>
-                                {found.post.date && <PostDate>{found.post.date.replace(/-/g, ".")}</PostDate>}
+                                {found.post.date && <PostDate>{formatDate(found.post.date)}</PostDate>}
                             </PostHeader>
                             {markdown === null
                                 ? <Status>불러오는 중...</Status>
@@ -73,14 +72,13 @@ const Page = styled.div`
     background: #0A0A0A;
 `;
 
-// 헤더가 fixed라서 헤더 높이 + 헤더 상하 패딩만큼 띄움
-const Main = styled.main<{ $paddingTop: number }>`
+const Main = styled.main`
     max-width: 760px;
     margin: 0 auto;
-    padding: ${props => props.$paddingTop + 56}px 16px 120px;
+    padding: calc(var(--header-height) + 24px) 16px 120px;
 
     ${media.mobile} {
-        padding-top: ${props => props.$paddingTop + 40}px;
+        padding-top: calc(var(--header-height) + 8px);
     }
 `;
 

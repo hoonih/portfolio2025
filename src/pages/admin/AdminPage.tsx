@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import styled from "styled-components";
-import { CATEGORIES, type ProjectRecord, type ProjectsFile } from "../portfolio/data/projects.ts";
+import { CATEGORIES, type ProjectRecord, type ProjectsFile } from "../../data/projectSchema.ts";
 import { type ProjectGroup, createEmptyProject, fetchPostBody, fetchProjects, imagePreviewUrl, saveProjects } from "./adminApi.ts";
 import ProjectEditor from "./ProjectEditor.tsx";
 import { GhostButton, PrimaryButton } from "./adminStyles.ts";

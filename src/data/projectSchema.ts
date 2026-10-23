@@ -1,4 +1,6 @@
-import projectsJson from "./projects.json";
+// projects.json 의 형태 정의
+// 브라우저 코드와 어드민 API(vite-plugin-admin.ts, Node)가 함께 쓰므로
+// Vite 전용 문법(import.meta.*)이나 DOM 의존 코드를 넣지 말 것
 
 // 포트폴리오 분류 (순서대로 표시됨)
 export const CATEGORIES = [
@@ -40,41 +42,3 @@ export interface ProjectsFile {
     main: ProjectRecord[];
     sub: ProjectRecord[];
 }
-
-// 화면에서 쓰는 형태 (image가 실제 URL로 변환됨)
-export interface Project extends Omit<ProjectRecord, "image" | "link" | "pdf"> {
-    image?: string;
-    link?: string;
-    pdf?: string;        // 실제 URL
-}
-
-export const pdfUrl = (fileName: string) => `${import.meta.env.BASE_URL}pdf/${fileName}`;
-
-const imageUrls = import.meta.glob<string>(
-    "../../../assets/portfolioimg/**/*.{png,jpg,jpeg,webp,gif}",
-    { eager: true, import: "default" },
-);
-
-const resolveImage = (path: string) =>
-    path ? imageUrls[`../../../assets/portfolioimg/${path}`] : undefined;
-
-const toProject = (record: ProjectRecord): Project => ({
-    ...record,
-    image: resolveImage(record.image),
-    link: record.link || undefined,
-    pdf: record.pdf ? pdfUrl(record.pdf) : undefined,
-});
-
-const data = projectsJson as ProjectsFile;
-
-export const mainPortfolioData: Project[] = data.main.map(toProject);
-export const subPortfolioData: Project[] = data.sub.map(toProject);
-
-// 직접 쓴 글의 메타데이터와 소속 프로젝트 찾기
-export const findPost = (slug: string) => {
-    for (const project of [...mainPortfolioData, ...subPortfolioData]) {
-        const post = project.posts.find(p => p.slug === slug);
-        if (post) return { post, project };
-    }
-    return null;
-};

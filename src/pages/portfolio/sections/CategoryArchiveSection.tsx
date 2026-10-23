@@ -1,7 +1,8 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import styled from "styled-components";
-import { CATEGORIES, mainPortfolioData, subPortfolioData, type Project } from "../data/projects.ts";
-import ProjectCard from "../component/ProjectCard.tsx";
+import { CATEGORIES } from "../../../data/projectSchema.ts";
+import { mainPortfolioData, subPortfolioData, type Project } from "../../../data/projects.ts";
+import ProjectCard from "../components/ProjectCard.tsx";
 import { media } from "../../../styles/media.ts";
 
 interface CategoryGroup {
@@ -200,9 +201,12 @@ const GroupTitle = styled.h2`
 
 const Grid = styled.div`
     display: grid;
-    grid-template-columns: repeat(3, minmax(0, 1fr));
+    grid-template-columns: repeat(4, minmax(0, 1fr));
     gap: 32px 16px;
 
+    @media (max-width: 1280px) {
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
     ${media.tablet} {
         grid-template-columns: repeat(2, minmax(0, 1fr));
     }

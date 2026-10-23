@@ -1,5 +1,5 @@
-import {GlobalStyle} from "./styles/styles.ts";
-import RootRoute from "./routes";
+import { GlobalStyle } from "./styles/GlobalStyle.ts";
+import RootRoute from "./routes/index.tsx";
 import { BrowserRouter } from "react-router-dom";
 
 function App() {

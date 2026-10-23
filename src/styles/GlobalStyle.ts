@@ -1,5 +1,4 @@
 import { createGlobalStyle } from "styled-components";
-// GlobalStyle 정의
 export const GlobalStyle = createGlobalStyle`
     //@import url("https://cdn.jsdelivr.net/npm/pretendard@1.3.9/dist/web/static/pretendard.css");
     @import url("https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable.min.css");
@@ -12,7 +11,7 @@ export const GlobalStyle = createGlobalStyle`
 
     html, body, div, span, applet, object, iframe,
     h1, h2, h3, h4, h5, h6, p, blockquote, pre,
-    a, abbr, acronym, address, big, cite, code, button
+    a, abbr, acronym, address, big, cite, code, button,
     del, dfn, em, img, ins, kbd, q, s, samp,
     small, strike, strong, sub, sup, tt, var,
     b, u, i, center,
@@ -76,5 +75,9 @@ export const GlobalStyle = createGlobalStyle`
     html, body {
         width: 100%;
         height: 100%;
+    }
+
+    :root {
+        --header-height: 0px; /* Header가 로고 크기를 재서 덮어씀 */
     }
 `;

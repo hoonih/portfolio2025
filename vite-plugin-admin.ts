@@ -2,6 +2,7 @@ import fs from "node:fs/promises";
 import path from "node:path";
 import type { IncomingMessage, ServerResponse } from "node:http";
 import type { Plugin } from "vite";
+import { CATEGORIES } from "./src/data/projectSchema.ts";
 
 // 개발 서버(npm run dev)에서만 동작하는 어드민 API.
 // 빌드 결과물에는 포함되지 않음 (apply: "serve").
@@ -12,15 +13,14 @@ import type { Plugin } from "vite";
 //   GET  /__admin/post?slug=  → 직접 쓴 글 본문(마크다운) 읽기
 //   POST /__admin/upload-post-image?name=파일명 → public/posts/images 에 글 이미지 저장 후 { url } 반환
 
-const DATA_FILE = path.resolve("src/pages/portfolio/data/projects.json");
+const DATA_FILE = path.resolve("src/data/projects.json");
 const IMAGE_ROOT = path.resolve("src/assets/portfolioimg");
 const UPLOAD_DIR = "uploads";
 const PDF_ROOT = path.resolve("public/pdf");
 const POSTS_DIR = path.resolve("src/content/posts");
 const POST_IMAGE_DIR = path.resolve("public/posts/images");
 const SLUG_PATTERN = /^[a-z0-9-]+$/;
-// src/pages/portfolio/data/projects.ts 의 CATEGORIES 와 같아야 함
-const CATEGORY_KEYS = new Set(["product-directing", "software-develop", "product-develop", "design"]);
+const CATEGORY_KEYS = new Set<string>(CATEGORIES.map(c => c.key));
 const MAX_UPLOAD_BYTES = 10 * 1024 * 1024;
 const MAX_PDF_BYTES = 50 * 1024 * 1024;
 const IMAGE_EXTS = new Set([".png", ".jpg", ".jpeg", ".webp", ".gif"]);

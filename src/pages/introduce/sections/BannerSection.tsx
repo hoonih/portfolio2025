@@ -1,5 +1,5 @@
 import styled from "styled-components";
-import { motion } from "framer-motion";
+import { motion, type Variants } from "framer-motion";
 import { Link } from "react-router-dom";
 import arrowForward from "../../../assets/arrow_forward.svg";
 import {media} from "../../../styles/media.ts";
@@ -32,7 +32,7 @@ const BannerSection = () => {
 export default BannerSection;
 
 
-const containerVariants = {
+const containerVariants: Variants = {
     hidden: {},
     visible: {
         transition: {
@@ -41,7 +41,7 @@ const containerVariants = {
     },
 };
 
-const itemVariants = {
+const itemVariants: Variants = {
     hidden: {
         opacity: 0,
         y: 20,
@@ -56,20 +56,20 @@ const itemVariants = {
     },
 };
 
-const Container = styled.div`
+const Container = styled.section`
     width: 100%;
     padding: 48px 16px;
     background-color: white;
     height: 36vh;
     min-height: 316px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
 
     ${media.mobile} {
         height: auto;
         min-height: 240px;
     }
-    display: flex;
-    justify-content: center;
-    align-items: center;
 `;
 
 const Content = styled(motion.div)`

@@ -1,5 +1,5 @@
-import { CATEGORIES, type ProjectRecord, type ProjectsFile } from "../portfolio/data/projects.ts";
-export { pdfUrl } from "../portfolio/data/projects.ts";
+import { CATEGORIES, type ProjectRecord, type ProjectsFile } from "../../data/projectSchema.ts";
+export { pdfUrl } from "../../data/projects.ts";
 
 export type ProjectGroup = keyof ProjectsFile; // "main" | "sub"
 

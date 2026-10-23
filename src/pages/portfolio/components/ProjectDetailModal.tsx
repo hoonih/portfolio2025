@@ -2,27 +2,19 @@ import { lazy, Suspense, useEffect, useState } from "react";
 import styled from "styled-components";
 import { AnimatePresence, motion } from "framer-motion";
 import { Link } from "react-router-dom";
-import type { Project } from "../data/projects.ts";
+import type { Project } from "../../../data/projects.ts";
 import { media } from "../../../styles/media.ts";
+import { formatDate, hostLabel } from "../../../utils/format.ts";
+import type { ProjectView } from "../portfolioState.ts";
 
 // pdf.js는 용량이 커서 상세를 열 때만 불러옴
 const PdfViewer = lazy(() => import("./PdfViewer.tsx"));
 
-type View = "slides" | "posts";
-
 interface Props {
     project: Project | null;
-    initialView?: View;
+    initialView?: ProjectView;
     onClose: () => void;
 }
-
-const hostLabel = (url: string) => {
-    try {
-        return new URL(url).hostname.replace(/^www\./, "");
-    } catch {
-        return url;
-    }
-};
 
 const ProjectDetailModal = ({ project, initialView = "slides", onClose }: Props) => {
     // 모달이 열려 있는 동안 ESC로 닫기 + 배경 스크롤 막기
@@ -70,8 +62,8 @@ const ProjectDetailModal = ({ project, initialView = "slides", onClose }: Props)
 
 export default ProjectDetailModal;
 
-const DetailContent = ({ project, initialView, onClose }: { project: Project; initialView: View; onClose: () => void }) => {
-    const [view, setView] = useState<View>(initialView);
+const DetailContent = ({ project, initialView, onClose }: { project: Project; initialView: ProjectView; onClose: () => void }) => {
+    const [view, setView] = useState<ProjectView>(initialView);
     const showPosts = view === "posts";
 
     return (
@@ -85,9 +77,9 @@ const DetailContent = ({ project, initialView, onClose }: { project: Project; in
                 <CloseButton type="button" onClick={onClose} aria-label="닫기">✕</CloseButton>
             </Head>
 
-            {(project.description || project.skills || project.joins) && (
-                <About>
-                    <summary>프로젝트 소개</summary>
+            {(project.image || project.description) && (
+                <Overview $hasImage={!!project.image}>
+                    {project.image && <Thumb src={project.image} alt={project.title} />}
                     {project.description && (
                         <Description>
                             {project.description.split("<br/>").map((line, idx) => (
@@ -98,11 +90,28 @@ const DetailContent = ({ project, initialView, onClose }: { project: Project; in
                             ))}
                         </Description>
                     )}
-                    <Meta>
-                        {project.skills && <p>사용 스킬: {project.skills}</p>}
-                        {project.joins && <p>참여인원: {project.joins}</p>}
-                    </Meta>
-                </About>
+                </Overview>
+            )}
+
+            {(project.skills || project.joins) && (
+                <Meta>
+                    {project.skills && (
+                        <MetaRow>
+                            <MetaLabel>Skills</MetaLabel>
+                            <Chips>
+                                {project.skills.split(",").map(s => s.trim()).filter(Boolean).map(skill => (
+                                    <Chip key={skill}>{skill}</Chip>
+                                ))}
+                            </Chips>
+                        </MetaRow>
+                    )}
+                    {project.joins && (
+                        <MetaRow>
+                            <MetaLabel>Team</MetaLabel>
+                            <MetaValue>{project.joins}</MetaValue>
+                        </MetaRow>
+                    )}
+                </Meta>
             )}
 
             <SwitchRow>
@@ -136,12 +145,7 @@ const DetailContent = ({ project, initialView, onClose }: { project: Project; in
                                 <PdfViewer url={project.pdf} />
                             </Suspense>
                         )
-                        : (
-                            <>
-                                {project.image && <Image src={project.image} alt={project.title} />}
-                                <Empty>아직 등록된 발표자료가 없어요.</Empty>
-                            </>
-                        )
+                        : <Empty>아직 등록된 발표자료가 없어요.</Empty>
                 )}
 
                 {showPosts && (
@@ -155,7 +159,7 @@ const DetailContent = ({ project, initialView, onClose }: { project: Project; in
                                                 <PostTitle>{post.title}</PostTitle>
                                                 <PostMeta>
                                                     {post.slug ? "블로그" : hostLabel(post.url)}
-                                                    {post.date && ` · ${post.date.replace(/-/g, ".")}`}
+                                                    {post.date && ` · ${formatDate(post.date)}`}
                                                 </PostMeta>
                                             </PostText>
                                             <Arrow aria-hidden>{post.slug ? "→" : "↗"}</Arrow>
@@ -268,42 +272,89 @@ const Subtitle = styled.p`
     }
 `;
 
-const About = styled.details`
-    margin: 16px 24px 0;
-    padding: 12px 16px;
-    border-radius: 10px;
-    background: #1A1A1A;
-
-    summary {
-        color: #C9C9C9;
-        font-size: 14px;
-        font-weight: 500;
-        cursor: pointer;
-    }
+// 썸네일은 작게 왼쪽에, 소개글은 바로 읽히도록 펼친 채로
+const Overview = styled.div<{ $hasImage: boolean }>`
+    display: grid;
+    grid-template-columns: ${props => props.$hasImage ? "240px 1fr" : "1fr"};
+    align-items: start;
+    gap: 20px;
+    margin: 20px 24px 0;
 
     ${media.mobile} {
+        grid-template-columns: 1fr;
+        gap: 14px;
         margin: 16px 16px 0;
     }
 `;
 
+const Thumb = styled.img`
+    display: block;
+    width: 100%;
+    aspect-ratio: 16 / 10;
+    object-fit: cover;
+    border-radius: 8px;
+    background: #191919;
+
+    ${media.mobile} {
+        max-width: 200px;
+    }
+`;
+
 const Description = styled.p`
-    margin-top: 12px;
-    color: #FFF;
+    color: #E6E6E6;
     font-size: 15px;
     font-weight: 400;
-    line-height: 1.6;
+    line-height: 1.7;
     word-break: keep-all;
 `;
 
 const Meta = styled.div`
     display: flex;
     flex-direction: column;
-    gap: 4px;
-    margin-top: 12px;
-    color: #9F9F9F;
+    gap: 10px;
+    margin: 20px 24px 0;
+    padding-top: 16px;
+    border-top: 1px solid #262626;
+
+    ${media.mobile} {
+        margin: 16px 16px 0;
+    }
+`;
+
+const MetaRow = styled.div`
+    display: grid;
+    grid-template-columns: 64px 1fr;
+    align-items: baseline;
+    gap: 12px;
+`;
+
+const MetaLabel = styled.span`
+    color: #7A7A7A;
     font-size: 13px;
+    font-weight: 500;
+`;
+
+const MetaValue = styled.span`
+    color: #C9C9C9;
+    font-size: 14px;
     font-weight: 400;
     line-height: 1.5;
+    word-break: keep-all;
+`;
+
+const Chips = styled.div`
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+`;
+
+const Chip = styled.span`
+    padding: 4px 10px;
+    border: 1px solid #333;
+    border-radius: 999px;
+    color: #C9C9C9;
+    font-size: 12px;
+    font-weight: 500;
 `;
 
 const SwitchRow = styled.div`
@@ -377,14 +428,6 @@ const ViewArea = styled.div`
     ${media.mobile} {
         padding: 0 16px 32px;
     }
-`;
-
-const Image = styled.img`
-    display: block;
-    width: 100%;
-    aspect-ratio: 16 / 9;
-    object-fit: cover;
-    border-radius: 8px;
 `;
 
 const Empty = styled.p`

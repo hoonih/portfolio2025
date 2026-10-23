@@ -1,5 +1,5 @@
 import styled from "styled-components";
-import type { Project } from "../data/projects.ts";
+import type { Project } from "../../../data/projects.ts";
 import { media } from "../../../styles/media.ts";
 
 interface Props {

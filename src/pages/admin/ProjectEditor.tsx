@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import styled from "styled-components";
-import { CATEGORIES, type CategoryKey, type ProjectPost, type ProjectRecord } from "../portfolio/data/projects.ts";
+import { CATEGORIES, type CategoryKey, type ProjectPost, type ProjectRecord } from "../../data/projectSchema.ts";
 import { type ProjectGroup, createPostSlug, imagePreviewUrl, pdfUrl, today, uploadImage, uploadPdf } from "./adminApi.ts";
 import { media } from "../../styles/media.ts";
 import { buttonStyle, GhostButton, Input, inputStyle, PrimaryButton } from "./adminStyles.ts";

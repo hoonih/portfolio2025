@@ -1,12 +1,21 @@
 import { useEffect, useRef } from "react";
 import Matter from "matter-js";
 
+// Matter.Mouse가 캔버스에 직접 붙이는 리스너들 — 공개 타입에는 없어서 보강
+type MouseListeners = Record<"mousedown" | "mousemove" | "mouseup" | "mousewheel", (event: Event) => void>;
+
+interface Skill {
+    name: string;
+    level: number; // 클수록 공과 글자가 커짐
+}
+
 interface Props {
+    skills: Skill[];
     width: number;
     height: number;
 }
 
-const GravitySkillBalls = ({width, height} : Props) => {
+const GravitySkillBalls = ({ skills, width, height }: Props) => {
     const sceneRef = useRef<HTMLDivElement>(null);
 
     useEffect(() => {
@@ -45,20 +54,6 @@ const GravitySkillBalls = ({width, height} : Props) => {
             Bodies.rectangle(width + 10, height / 2, 20, height, { isStatic: true }),
         ];
 
-        // 스킬 정의
-        const skills = [
-            { name: "React native", level: 14 },
-            { name: "Android", level: 10 },
-            { name: "React", level: 12 },
-            { name: "Laravel", level: 5 },
-            { name: "TypeScript", level: 7 },
-            { name: "C++", level: 7 },
-            { name: "Python", level: 6 },
-            { name: "Figma", level: 6 },
-            { name: "Notion", level: 6 },
-            { name: "Arduino", level: 8 },
-        ];
-
         // 컨테이너 너비에 맞춰 공 크기 조절 (데스크톱 기준 700px)
         const scale = Math.min(1, Math.max(0.5, width / 700));
 
@@ -74,7 +69,7 @@ const GravitySkillBalls = ({width, height} : Props) => {
                     render: {
                         fillStyle: "#ffffff",
                     },
-                    label: skill.name, // 👈 텍스트용
+                    label: skill.name, // afterRender에서 공 위에 그림
                 }
             );
         });
@@ -82,13 +77,13 @@ const GravitySkillBalls = ({width, height} : Props) => {
         World.add(engine.world, [...walls, ...balls]);
 
         // 드래그 (스프링 숨김)
-        const mouse = Mouse.create(render.canvas);
+        const mouse = Mouse.create(render.canvas) as Matter.Mouse & MouseListeners;
         const mouseConstraint = MouseConstraint.create(engine, {
             mouse,
             constraint: {
                 stiffness: 0.15,
                 render: {
-                    visible: false, // 👈 초록색 선 제거
+                    visible: false, // 드래그 시 연결선 숨김
                 },
             },
         });
@@ -124,7 +119,7 @@ const GravitySkillBalls = ({width, height} : Props) => {
         canvas.addEventListener("touchmove", onTouchMove, { passive: false });
         canvas.addEventListener("touchend", onTouchEnd, { passive: false });
 
-        // 🔥 공 중앙 텍스트 렌더링
+        // 공 중앙 텍스트 렌더링
         Events.on(render, "afterRender", () => {
             const ctx = render.context;
 
@@ -135,7 +130,7 @@ const GravitySkillBalls = ({width, height} : Props) => {
             balls.forEach((ball) => {
                 const radius = ball.circleRadius || 20;
 
-                // 🔥 레벨이 클수록 글자도 커짐
+                // 공이 클수록 글자도 커짐
                 const fontSize = Math.max(9, radius * 0.35 - 5);
 
                 ctx.font = `600 ${fontSize}px Pretendard, sans-serif`;
@@ -162,7 +157,7 @@ const GravitySkillBalls = ({width, height} : Props) => {
             Engine.clear(engine);
             render.canvas.remove();
         };
-    }, [width, height]);
+    }, [skills, width, height]);
 
     return <div ref={sceneRef} />;
 };
