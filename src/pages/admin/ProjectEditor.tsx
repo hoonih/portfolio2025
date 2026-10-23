@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import styled from "styled-components";
-import { CATEGORIES, type CategoryKey, type ProjectPost, type ProjectRecord } from "../../data/projectSchema.ts";
+import { CATEGORIES, emptyTranslation, type CategoryKey, type ProjectPost, type ProjectRecord, type ProjectTranslation } from "../../data/projectSchema.ts";
 import { type ProjectGroup, createPostSlug, imagePreviewUrl, pdfUrl, today, uploadImage, uploadPdf } from "./adminApi.ts";
 import { media } from "../../styles/media.ts";
 import { buttonStyle, GhostButton, Input, inputStyle, PrimaryButton } from "./adminStyles.ts";
@@ -28,7 +28,14 @@ const toEditorText = (html: string) => html.replace(/ ?<br\/>/g, "\n");
 const toStoredText = (text: string) => text.replace(/\r?\n/g, "<br/>");
 
 const ProjectEditor = ({ project, group, isNew, loadPostBody, onApply, onCancel }: Props) => {
-    const [form, setForm] = useState({ ...project, description: toEditorText(project.description) });
+    const [form, setForm] = useState(() => {
+        const en = { ...emptyTranslation(), ...project.en };
+        return {
+            ...project,
+            description: toEditorText(project.description),
+            en: { ...en, description: toEditorText(en.description) },
+        };
+    });
     const [formGroup, setFormGroup] = useState<ProjectGroup>(group);
     const [uploading, setUploading] = useState(false);
     const [uploadingPdf, setUploadingPdf] = useState(false);
@@ -101,6 +108,9 @@ const ProjectEditor = ({ project, group, isNew, loadPostBody, onApply, onCancel 
         }
     };
 
+    const setEn = (key: keyof ProjectTranslation, value: string) =>
+        setForm(prev => ({ ...prev, en: { ...prev.en, [key]: value } }));
+
     const setPost = (index: number, patch: Partial<ProjectPost>) =>
         set("posts", form.posts.map((post, i) => i === index ? { ...post, ...patch } : post));
 
@@ -139,6 +149,12 @@ const ProjectEditor = ({ project, group, isNew, loadPostBody, onApply, onCancel 
                 title: form.title.trim(),
                 link: form.link.trim(),
                 description: toStoredText(form.description.trim()),
+                en: {
+                    title: form.en.title.trim(),
+                    subtitle: form.en.subtitle.trim(),
+                    description: toStoredText(form.en.description.trim()),
+                    joins: form.en.joins.trim(),
+                },
                 posts,
             },
             formGroup,
@@ -180,12 +196,12 @@ const ProjectEditor = ({ project, group, isNew, loadPostBody, onApply, onCancel 
                 </Field>
 
                 <Field>
-                    <Label>제목 *</Label>
+                    <Label>제목 (한국어) *</Label>
                     <Input value={form.title} onChange={(e) => set("title", e.target.value)} placeholder="예: LAP" />
                 </Field>
 
                 <Field>
-                    <Label>한 줄 소개</Label>
+                    <Label>한 줄 소개 (한국어)</Label>
                     <Input value={form.subtitle} onChange={(e) => set("subtitle", e.target.value)} placeholder="예: 시각장애인을 위한 매장 내 길찾기" />
                 </Field>
 
@@ -226,7 +242,7 @@ const ProjectEditor = ({ project, group, isNew, loadPostBody, onApply, onCancel 
                 </Field>
 
                 <Field>
-                    <Label>설명</Label>
+                    <Label>설명 (한국어)</Label>
                     <Textarea
                         rows={8}
                         value={form.description}
@@ -241,9 +257,30 @@ const ProjectEditor = ({ project, group, isNew, loadPostBody, onApply, onCancel 
                 </Field>
 
                 <Field>
-                    <Label>참여인원</Label>
+                    <Label>참여인원 (한국어)</Label>
                     <Input value={form.joins} onChange={(e) => set("joins", e.target.value)} placeholder="예: 홍예훈(시스템 설계/개발), 이주영(디자인)" />
                 </Field>
+
+                <Section>
+                    <SectionTitle>English</SectionTitle>
+                    <Hint>영어가 기본 언어예요. 비워 둔 항목은 위의 한국어가 그대로 표시돼요.</Hint>
+                    <Field>
+                        <Label>Title</Label>
+                        <Input value={form.en.title} onChange={(e) => setEn("title", e.target.value)} placeholder={form.title || "예: LAP"} />
+                    </Field>
+                    <Field>
+                        <Label>Subtitle</Label>
+                        <Input value={form.en.subtitle} onChange={(e) => setEn("subtitle", e.target.value)} placeholder="e.g. Indoor navigation for visually impaired shoppers" />
+                    </Field>
+                    <Field>
+                        <Label>Description</Label>
+                        <Textarea rows={8} value={form.en.description} onChange={(e) => setEn("description", e.target.value)} />
+                    </Field>
+                    <Field>
+                        <Label>Team</Label>
+                        <Input value={form.en.joins} onChange={(e) => setEn("joins", e.target.value)} placeholder="e.g. Yehoon Hong (system design/development)" />
+                    </Field>
+                </Section>
 
                 <Field as="div">
                     <Label>발표자료 (PDF)</Label>
@@ -404,6 +441,21 @@ const Label = styled.span`
     font-weight: 500;
 `;
 
+
+const Section = styled.div`
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    padding: 16px;
+    border-radius: 12px;
+    background: #1A1A1A;
+`;
+
+const SectionTitle = styled.h3`
+    color: #FFF;
+    font-size: 15px;
+    font-weight: 600;
+`;
 
 const Select = styled.select`${inputStyle}`;
 const Textarea = styled.textarea`

@@ -1,5 +1,6 @@
 import projectsJson from "./projects.json";
-import type { ProjectRecord, ProjectsFile } from "./projectSchema.ts";
+import { TRANSLATED_FIELDS, emptyTranslation, type ProjectRecord, type ProjectsFile } from "./projectSchema.ts";
+import type { Lang } from "../i18n/lang.ts";
 
 // 화면에서 쓰는 형태 (image가 실제 URL로 변환됨)
 export interface Project extends Omit<ProjectRecord, "image" | "link" | "pdf"> {
@@ -23,7 +24,18 @@ const toProject = (record: ProjectRecord): Project => ({
     image: resolveImage(record.image),
     link: record.link || undefined,
     pdf: record.pdf ? pdfUrl(record.pdf) : undefined,
+    en: { ...emptyTranslation(), ...record.en },
 });
+
+// 고른 언어로 표시할 문구 적용. 번역이 비어 있으면 한국어 원문 유지
+export const localizeProject = (project: Project, lang: Lang): Project => {
+    if (lang === "ko") return project;
+    const localized = { ...project };
+    TRANSLATED_FIELDS.forEach(key => {
+        if (project.en[key].trim()) localized[key] = project.en[key];
+    });
+    return localized;
+};
 
 const data = projectsJson as ProjectsFile;
 

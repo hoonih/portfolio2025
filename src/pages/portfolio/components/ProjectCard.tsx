@@ -1,5 +1,6 @@
 import styled from "styled-components";
-import type { Project } from "../../../data/projects.ts";
+import { localizeProject, type Project } from "../../../data/projects.ts";
+import { useLanguage } from "../../../i18n/languageContext.ts";
 import { media } from "../../../styles/media.ts";
 
 interface Props {
@@ -9,19 +10,21 @@ interface Props {
 }
 
 const ProjectCard = ({ project, pinned = false, onSelect }: Props) => {
+    const { lang } = useLanguage();
+    const { title, subtitle } = localizeProject(project, lang);
     const content = (
         <>
             <Thumbnail>
                 {pinned && <PinnedBadge>MAIN</PinnedBadge>}
                 {project.image
-                    ? <img src={project.image} alt={project.title} loading="lazy" />
-                    : <Placeholder>{project.title}</Placeholder>}
+                    ? <img src={project.image} alt={title} loading="lazy" />
+                    : <Placeholder>{title}</Placeholder>}
             </Thumbnail>
             <Title>
-                {project.title}
+                {title}
                 <Year>{project.year}</Year>
             </Title>
-            <Subtitle>{project.subtitle}</Subtitle>
+            <Subtitle>{subtitle}</Subtitle>
         </>
     );
 

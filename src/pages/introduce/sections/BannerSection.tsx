@@ -3,8 +3,12 @@ import { motion, type Variants } from "framer-motion";
 import { Link } from "react-router-dom";
 import arrowForward from "../../../assets/arrow_forward.svg";
 import {media} from "../../../styles/media.ts";
+import { useLanguage } from "../../../i18n/languageContext.ts";
+import RichText from "../../../i18n/RichText.tsx";
 
 const BannerSection = () => {
+    const { t } = useLanguage();
+
     return (
         <Container>
             <Content
@@ -14,13 +18,12 @@ const BannerSection = () => {
                 variants={containerVariants}
             >
                 <TitleText variants={itemVariants}>
-                    사회 문제의 기술적 솔루션을 설계하고 <br />
-                    웹앱 서비스로 구현하며 사람들의 일상 속에 자연스럽게 녹여냅니다.
+                    <RichText text={t.banner.title} />
                 </TitleText>
 
                 <motion.div variants={itemVariants}>
                     <PortfolioLink to="/portfolio">
-                        포트폴리오 보러가기
+                        {t.banner.cta}
                         <img src={arrowForward} alt="" width={20} height={20} />
                     </PortfolioLink>
                 </motion.div>

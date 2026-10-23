@@ -2,7 +2,8 @@ import { lazy, Suspense, useEffect, useState } from "react";
 import styled from "styled-components";
 import { AnimatePresence, motion } from "framer-motion";
 import { Link } from "react-router-dom";
-import type { Project } from "../../../data/projects.ts";
+import { localizeProject, type Project } from "../../../data/projects.ts";
+import { useLanguage } from "../../../i18n/languageContext.ts";
 import { media } from "../../../styles/media.ts";
 import { formatDate, hostLabel } from "../../../utils/format.ts";
 import type { ProjectView } from "../portfolioState.ts";
@@ -16,7 +17,10 @@ interface Props {
     onClose: () => void;
 }
 
-const ProjectDetailModal = ({ project, initialView = "slides", onClose }: Props) => {
+const ProjectDetailModal = ({ project: original, initialView = "slides", onClose }: Props) => {
+    const { lang } = useLanguage();
+    const project = original && localizeProject(original, lang);
+
     // 모달이 열려 있는 동안 ESC로 닫기 + 배경 스크롤 막기
     useEffect(() => {
         if (!project) return;
@@ -63,6 +67,7 @@ const ProjectDetailModal = ({ project, initialView = "slides", onClose }: Props)
 export default ProjectDetailModal;
 
 const DetailContent = ({ project, initialView, onClose }: { project: Project; initialView: ProjectView; onClose: () => void }) => {
+    const { t } = useLanguage();
     const [view, setView] = useState<ProjectView>(initialView);
     const showPosts = view === "posts";
 
@@ -74,7 +79,7 @@ const DetailContent = ({ project, initialView, onClose }: { project: Project; in
                     <Title>{project.title}</Title>
                     <Subtitle>{project.subtitle}</Subtitle>
                 </HeadText>
-                <CloseButton type="button" onClick={onClose} aria-label="닫기">✕</CloseButton>
+                <CloseButton type="button" onClick={onClose} aria-label={t.portfolio.close}>✕</CloseButton>
             </Head>
 
             {(project.image || project.description) && (
@@ -97,7 +102,7 @@ const DetailContent = ({ project, initialView, onClose }: { project: Project; in
                 <Meta>
                     {project.skills && (
                         <MetaRow>
-                            <MetaLabel>Skills</MetaLabel>
+                            <MetaLabel>{t.portfolio.skills}</MetaLabel>
                             <Chips>
                                 {project.skills.split(",").map(s => s.trim()).filter(Boolean).map(skill => (
                                     <Chip key={skill}>{skill}</Chip>
@@ -107,7 +112,7 @@ const DetailContent = ({ project, initialView, onClose }: { project: Project; in
                     )}
                     {project.joins && (
                         <MetaRow>
-                            <MetaLabel>Team</MetaLabel>
+                            <MetaLabel>{t.portfolio.team}</MetaLabel>
                             <MetaValue>{project.joins}</MetaValue>
                         </MetaRow>
                     )}
@@ -119,7 +124,7 @@ const DetailContent = ({ project, initialView, onClose }: { project: Project; in
                     type="button"
                     role="switch"
                     aria-checked={showPosts}
-                    aria-label="회고 · 블로그 보기"
+                    aria-label={t.portfolio.showPosts}
                     onClick={() => setView(showPosts ? "slides" : "posts")}
                 >
                     <SwitchKnob
@@ -127,13 +132,13 @@ const DetailContent = ({ project, initialView, onClose }: { project: Project; in
                         animate={{ x: showPosts ? "100%" : "0%" }}
                         transition={{ type: "spring", stiffness: 500, damping: 35 }}
                     />
-                    <SwitchLabel $active={!showPosts}>발표자료</SwitchLabel>
+                    <SwitchLabel $active={!showPosts}>{t.portfolio.slides}</SwitchLabel>
                     <SwitchLabel $active={showPosts}>
-                        회고 · 블로그{project.posts.length > 0 && ` ${project.posts.length}`}
+                        {t.portfolio.posts}{project.posts.length > 0 && ` ${project.posts.length}`}
                     </SwitchLabel>
                 </Switch>
                 {!showPosts && project.pdf && (
-                    <OpenLink href={project.pdf} target="_blank" rel="noopener noreferrer">새 탭에서 열기 ↗</OpenLink>
+                    <OpenLink href={project.pdf} target="_blank" rel="noopener noreferrer">{t.portfolio.openInNewTab}</OpenLink>
                 )}
             </SwitchRow>
 
@@ -141,11 +146,11 @@ const DetailContent = ({ project, initialView, onClose }: { project: Project; in
                 {!showPosts && (
                     project.pdf
                         ? (
-                            <Suspense fallback={<Empty>발표자료를 불러오는 중...</Empty>}>
+                            <Suspense fallback={<Empty>{t.portfolio.loadingSlides}</Empty>}>
                                 <PdfViewer url={project.pdf} />
                             </Suspense>
                         )
-                        : <Empty>아직 등록된 발표자료가 없어요.</Empty>
+                        : <Empty>{t.portfolio.noSlides}</Empty>
                 )}
 
                 {showPosts && (
@@ -158,7 +163,7 @@ const DetailContent = ({ project, initialView, onClose }: { project: Project; in
                                             <PostText>
                                                 <PostTitle>{post.title}</PostTitle>
                                                 <PostMeta>
-                                                    {post.slug ? "블로그" : hostLabel(post.url)}
+                                                    {post.slug ? t.portfolio.blog : hostLabel(post.url)}
                                                     {post.date && ` · ${formatDate(post.date)}`}
                                                 </PostMeta>
                                             </PostText>
@@ -175,7 +180,7 @@ const DetailContent = ({ project, initialView, onClose }: { project: Project; in
                                 })}
                             </PostList>
                         )
-                        : <Empty>아직 작성된 회고나 블로그 글이 없어요.</Empty>
+                        : <Empty>{t.portfolio.noPosts}</Empty>
                 )}
             </ViewArea>
         </>

@@ -12,7 +12,13 @@
       "skills": "ReactNative, Swift, OpenCV, ChatGPT API, FastAPI, WebRTC, Oracle Cloud, Docker",
       "joins": "홍예훈(시스템 설계/개발), 이주영(BM/디자인)",
       "pdf": "",
-      "posts": []
+      "posts": [],
+      "en": {
+        "title": "",
+        "subtitle": "Indoor navigation for visually impaired shoppers",
+        "description": "Conventional indoor positioning systems rely on Bluetooth beacons or RFID, but installation and maintenance costs make them hard to deploy in real stores.<br/><br/>To address this, we designed an indoor navigation system built on computer vision. With a single marker and no additional hardware, it loads the store's floor plan, and an AI agent guides visually impaired shoppers along routes through the store. This helps them browse and buy products more independently.",
+        "joins": "Yehoon Hong (system design/development), Jooyoung Lee (business model/design)"
+      }
     },
     {
       "id": "main-2",
@@ -26,7 +32,13 @@
       "skills": "React Native, Bluetooth, ESP32, Arduino Uno, RF24, RFID(RC522), Embedded C/C++, TFT Display",
       "joins": "홍예훈(시스템 설계/개발), 이주영(BM 구축/디자인)",
       "pdf": "",
-      "posts": []
+      "posts": [],
+      "en": {
+        "title": "",
+        "subtitle": "A digital rehabilitation kit for children with language delays from low-income families",
+        "description": "Speech rehabilitation for children with language developmental disorders requires long-term professional sessions, and high treatment costs often make ongoing care difficult. Low-income families in particular face a structural barrier: early intervention matters, yet the financial burden keeps children from getting enough therapy.<br/><br/>To tackle this, we designed SYNC, an interactive rehabilitation system that lets children experience language therapy naturally in daily life. A dedicated app connects to Bluetooth-enabled physical blocks to deliver word, sentence, and cognitive exercises as play, so children learn language structure by combining the blocks themselves.<br/><br/>With low-cost hardware and reusable content, SYNC lowers the cost of rehabilitation, and it records and analyzes therapy data to give insights to caregivers and specialists. This helps children with language delays build their skills in a more consistent and accessible environment.",
+        "joins": "Yehoon Hong (system design/development), Jooyoung Lee (business model/design)"
+      }
     },
     {
       "id": "main-3",
@@ -40,7 +52,13 @@
       "skills": "React Native, Swift, ESP32, Bluetooth, Embedded web server, Laravel(php), NFC",
       "joins": "1차. 홍예훈(PM, 하드웨어, AI), 조성훈(백엔드), 권지원(앱개발), 김대현(디자인) 2차. 홍예훈(프론트, 백엔드, 하드웨어, AI))",
       "pdf": "",
-      "posts": []
+      "posts": [],
+      "en": {
+        "title": "",
+        "subtitle": "An NFC point-reward device for managing groceries",
+        "description": "Food waste keeps growing due to overproduction and overconsumption, leading not only to wasted resources but also to environmental pollution and economic loss. Household food waste in particular stems from a structural problem: consumers have no systematic way to manage the groceries they buy.<br/><br/>Existing grocery management services require users to enter information manually, which makes them hard to keep using, and approaches tied to supermarket POS systems suffer from low participation in point rewards.<br/><br/>To solve this, we designed Sangle, an NFC-based grocery management service. A single tap of a phone collects reward points and pulls in receipt data so that expiration dates are tracked automatically. It also analyzes consumption patterns to visualize food waste and uses AI to recommend the right purchase quantities.<br/><br/>When rebuilding the project, we reduced hardware dependency and redesigned the business model as a B2B partnership with POS providers, improving scalability and real-world feasibility. The result is a sustainable system that structurally reduces food waste while keeping the burden on users to a minimum.",
+        "joins": "Phase 1: Yehoon Hong (PM, hardware, AI), Sunghoon Cho (backend), Jiwon Kwon (app development), Daehyun Kim (design) / Phase 2: Yehoon Hong (frontend, backend, hardware, AI)"
+      }
     }
   ],
   "sub": [
@@ -56,7 +74,13 @@
       "skills": "ReactNative, SpringBoot",
       "joins": "홍예훈(PM/개발자), 김세빛(브랜딩 디자이너), 김대현(UI/UX 디자이너)",
       "pdf": "",
-      "posts": []
+      "posts": [],
+      "en": {
+        "title": "",
+        "subtitle": "An emotion-based social service for people tired of social media",
+        "description": "Social media has drifted away from relationship-centered networking toward content consumption and self-display, leaving users fatigued and their relationships distorted. Amid algorithm-driven competition for attention and constant self-curation, many people are losing honest emotional expression and meaningful communication.<br/><br/>THEIA is an emotion-centered social networking service born from this concern. Users can easily record and share everyday feelings and memories through text, photos, and videos, and content is visible only to mutually accepted friends. THEIA aims to foster healthy relationships built on empathy and support rather than comparison and display.",
+        "joins": "Yehoon Hong (PM/developer), Sebit Kim (branding designer), Daehyun Kim (UI/UX designer)"
+      }
     },
     {
       "id": "sub-2",
@@ -70,7 +94,13 @@
       "skills": "ReactNative, React Vite",
       "joins": "홍예훈(프론트엔드), 이주영(디자인), 조성훈(백엔드)",
       "pdf": "",
-      "posts": []
+      "posts": [],
+      "en": {
+        "title": "Home Meal Essentials",
+        "subtitle": "A side-dish subscription service for single-person households",
+        "description": "In busy daily life, consistently eating home-cooked meals is a burden of time and energy for many people. Single-person households and dual-income families in particular often give up on home meals because planning menus and preparing side dishes every time is too much.<br/><br/>Home Meal Essentials is a project that planned a side-dish subscription service to solve this problem.",
+        "joins": "Yehoon Hong (frontend), Jooyoung Lee (design), Sunghoon Cho (backend)"
+      }
     },
     {
       "id": "sub-3",
@@ -84,7 +114,13 @@
       "skills": "NextJS, SpringBoot, FastAPI, FFmpeg, Python, ElevenAPI",
       "joins": "홍예훈(시스템 설계, 개발), 이주영(디자인), 권지원(프론트엔드), 조성훈(백엔드)",
       "pdf": "",
-      "posts": []
+      "posts": [],
+      "en": {
+        "title": "Healthy Team Communication Solution",
+        "subtitle": "A messenger built on nonverbal expression",
+        "description": "In online collaboration, text-centered communication often fails to convey emotion, which easily leads to misunderstandings and conflict. In team projects especially, the absence of nonverbal cues is a major cause of poor communication.<br/><br/>This project designed a communication solution that combines nonverbal emotional expression with a work chat platform. Emotion-specific face images are pre-generated from each user's profile photo, and when a message is typed, voice and consonant/vowel pronunciation data drive a profile animation with naturally moving lips.<br/><br/>To overcome the high latency of existing AI video generation, we separated and redesigned the voice generation and lip-shape generation pipelines, and applied frame mapping and interpolation to cut interaction latency to under 2–3 seconds. This enables healthy, emotionally expressive communication even in fast-paced collaborative environments.",
+        "joins": "Yehoon Hong (system design, development), Jooyoung Lee (design), Jiwon Kwon (frontend), Sunghoon Cho (backend)"
+      }
     },
     {
       "id": "sub-4",
@@ -98,7 +134,13 @@
       "skills": "Android, raspberry pi, arduino, linear actuators, motor controller",
       "joins": "홍예훈(시스템 설계/개발), 김대현(디자인), 문제원(앱/서버 구축)",
       "pdf": "",
-      "posts": []
+      "posts": [],
+      "en": {
+        "title": "Tumdaeseo",
+        "subtitle": "A tumbler rental service to reduce the tumbler rebound effect",
+        "description": "Tumblers are spreading as a way to cut single-use plastics, a major contributor to global warming and ocean pollution. However, excessive production and purchase of tumblers creates a rebound effect that actually increases the environmental burden. Ownership-centered solutions have clear limits in fundamentally reducing single-use plastic.<br/><br/>To curb this rebound effect, this project designed and built an automated vending machine that lets people rent tumblers instead of buying them. The system is built on Raspberry Pi and Arduino, with linear actuators automating the rental and return process. It offers a sustainable alternative that improves accessibility while reducing unnecessary tumbler production.",
+        "joins": "Yehoon Hong (system design/development), Daehyun Kim (design), Jewon Moon (app/server)"
+      }
     },
     {
       "id": "sub-5",
@@ -112,7 +154,13 @@
       "skills": "ReactNative, Swift, OpenCV, ChatGPT API, FastAPI, WebRTC, Oracle Cloud, Docker",
       "joins": "홍예훈(PM, 웹개발), 유도윤(앱), 조성훈(백엔드), 이정훈(AI), 김대현(디자인)",
       "pdf": "",
-      "posts": []
+      "posts": [],
+      "en": {
+        "title": "",
+        "subtitle": "An AI doll that understands a child's feelings",
+        "description": "As dual-income and nuclear families become more common, it is getting harder for parents to keep track of their children's emotional changes. Children's anxieties and worries often go unexpressed, so appropriate emotional care tends to come late.<br/><br/>Hugle is an AI-powered companion doll designed to address this. When a child talks freely with the doll and expresses feelings, speech recognition and conversational AI respond with empathy and offer steady emotional support. Conversations are shared with a counselor chosen by the guardian, helping them understand the child's emotional state and give appropriate feedback.<br/><br/>Going beyond a simple talking toy, Hugle aims to be an emotional care platform connecting children, parents, and professionals, so that children can express their feelings in a safe and healthy environment.",
+        "joins": "Yehoon Hong (PM, web development), Doyoon Yoo (app), Sunghoon Cho (backend), Junghoon Lee (AI), Daehyun Kim (design)"
+      }
     },
     {
       "id": "sub-6",
@@ -126,7 +174,13 @@
       "skills": "",
       "joins": "홍예훈(1인 개발)",
       "pdf": "",
-      "posts": []
+      "posts": [],
+      "en": {
+        "title": "",
+        "subtitle": "Graduation exhibition website for the Dept. of Content Design, Sunrin Internet High School (solo developer)",
+        "description": "",
+        "joins": "Yehoon Hong (solo developer)"
+      }
     },
     {
       "id": "sub-7",
@@ -140,7 +194,13 @@
       "skills": "",
       "joins": "홍예훈(1인 개발)",
       "pdf": "",
-      "posts": []
+      "posts": [],
+      "en": {
+        "title": "",
+        "subtitle": "Showcase website for the Dept. of Content Design, Sunrin Internet High School (solo developer)",
+        "description": "",
+        "joins": "Yehoon Hong (solo developer)"
+      }
     }
   ]
 }

@@ -2,7 +2,7 @@ import fs from "node:fs/promises";
 import path from "node:path";
 import type { IncomingMessage, ServerResponse } from "node:http";
 import type { Plugin } from "vite";
-import { CATEGORIES } from "./src/data/projectSchema.ts";
+import { CATEGORIES, TRANSLATED_FIELDS } from "./src/data/projectSchema.ts";
 
 // 개발 서버(npm run dev)에서만 동작하는 어드민 API.
 // 빌드 결과물에는 포함되지 않음 (apply: "serve").
@@ -70,6 +70,10 @@ const validateProjects = (data: unknown): string | null => {
         if (p.image) {
             const resolved = path.resolve(IMAGE_ROOT, p.image as string);
             if (!resolved.startsWith(IMAGE_ROOT + path.sep)) return `"${p.title}"의 이미지 경로가 올바르지 않습니다`;
+        }
+        const en = p.en as Record<string, unknown> | undefined;
+        if (!en || typeof en !== "object" || TRANSLATED_FIELDS.some(key => !isString(en[key]))) {
+            return `"${p.title}"의 영어 번역 값이 올바르지 않습니다`;
         }
         if (!isString(p.pdf)) return `"${p.title}"의 pdf 값이 올바르지 않습니다`;
         if (p.pdf && (path.basename(p.pdf) !== p.pdf || !p.pdf.toLowerCase().endsWith(".pdf"))) {

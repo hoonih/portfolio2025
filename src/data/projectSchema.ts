@@ -22,7 +22,20 @@ export interface ProjectPost {
     date: string;        // "YYYY-MM-DD" (없으면 "")
 }
 
+// 영어 번역. 비어 있는 항목은 한국어 원문이 그대로 표시됨
+export interface ProjectTranslation {
+    title: string;
+    subtitle: string;
+    description: string;
+    joins: string;
+}
+
+export const TRANSLATED_FIELDS = ["title", "subtitle", "description", "joins"] as const;
+
+export const emptyTranslation = (): ProjectTranslation => ({ title: "", subtitle: "", description: "", joins: "" });
+
 // projects.json 의 한 항목. 어드민(/admin, 개발 서버 전용)에서 편집함
+// title/subtitle/description/joins는 한국어 원문, en은 영어 번역
 export interface ProjectRecord {
     id: string;
     title: string;
@@ -36,6 +49,7 @@ export interface ProjectRecord {
     joins: string;
     pdf: string;         // public/pdf 기준 파일명 (발표자료, 없으면 "")
     posts: ProjectPost[];
+    en: ProjectTranslation;
 }
 
 export interface ProjectsFile {

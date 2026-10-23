@@ -1,4 +1,4 @@
-import { CATEGORIES, type ProjectRecord, type ProjectsFile } from "../../data/projectSchema.ts";
+import { CATEGORIES, emptyTranslation, type ProjectRecord, type ProjectsFile } from "../../data/projectSchema.ts";
 export { pdfUrl } from "../../data/projects.ts";
 
 export type ProjectGroup = keyof ProjectsFile; // "main" | "sub"
@@ -64,4 +64,5 @@ export const createEmptyProject = (): ProjectRecord => ({
     joins: "",
     pdf: "",
     posts: [],
+    en: emptyTranslation(),
 });

@@ -1,11 +1,13 @@
 import { useState } from "react";
 import styled from "styled-components";
 import { motion, type Variants } from "framer-motion";
-import { CONTACT_TOPICS, CONTACTS, EMAIL } from "../../data/profile.ts";
+import { CONTACTS, EMAIL } from "../../data/profile.ts";
+import { useLanguage } from "../../i18n/languageContext.ts";
 import { media } from "../../styles/media.ts";
 
 const ConnectPage = () => {
     const [copied, setCopied] = useState(false);
+    const { t } = useLanguage();
 
     const copyEmail = async () => {
         try {
@@ -26,10 +28,10 @@ const ConnectPage = () => {
                 >
                     <Title variants={itemVariants}>Let's connect.</Title>
                     <Topics variants={itemVariants}>
-                        {CONTACT_TOPICS.map(topic => <Topic key={topic}>{topic}</Topic>)}
+                        {t.connect.topics.map(topic => <Topic key={topic}>{topic}</Topic>)}
                     </Topics>
                     <Lead variants={itemVariants}>
-                        새로운 아이디어나 함께 풀고 싶은 문제가 있다면 편하게 연락주세요.
+                        {t.connect.lead}
                     </Lead>
                 </Hero>
 
@@ -50,7 +52,7 @@ const ConnectPage = () => {
                 </List>
 
                 <CopyButton type="button" onClick={copyEmail}>
-                    {copied ? "복사되었어요 ✓" : "이메일 주소 복사"}
+                    {copied ? t.connect.copied : t.connect.copy}
                 </CopyButton>
         </Container>
     );

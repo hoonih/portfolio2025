@@ -1,30 +1,31 @@
 import styled from "styled-components";
-import GravitySkillBalls from "../components/GravitySkillBalls.tsx";
+import GravitySkillShapes from "../components/GravitySkillShapes.tsx";
 import { AWARDS, CAREERS, SKILLS } from "../../../data/profile.ts";
 import { useDebouncedSize } from "../../../hooks/useDebouncedSize.ts";
 import { media } from "../../../styles/media.ts";
+import { useLanguage } from "../../../i18n/languageContext.ts";
+import RichText from "../../../i18n/RichText.tsx";
 
 const ProfileSection = () => {
     // 크기가 자리 잡은 뒤에만 물리 엔진을 띄움 (리사이즈 중에는 매번 다시 만들지 않도록)
     const [skillBoxRef, skillBoxSize] = useDebouncedSize<HTMLDivElement>();
+    const { lang, t } = useLanguage();
 
     return (
         <Container>
             <InfoColumn>
                 <IntroText>
-                    I aim to deliver value through <strong>IT services</strong> that have a viable{" "}
-                    <strong>Business Model</strong>, achieved by fusing various IT technologies based on my
-                    broad interdisciplinary study.
+                    <RichText text={t.intro} />
                 </IntroText>
 
                 <Groups>
                     <Group>
                         <GroupTitle>Career</GroupTitle>
                         {CAREERS.map(({ school, details }) => (
-                            <CareerRow key={school}>
-                                <BoldText>{school}</BoldText>
+                            <CareerRow key={school.ko}>
+                                <BoldText>{school[lang]}</BoldText>
                                 <CareerDetail>
-                                    {details.map(detail => <NormalText key={detail}>{detail}</NormalText>)}
+                                    {details.map(detail => <NormalText key={detail.ko}>{detail[lang]}</NormalText>)}
                                 </CareerDetail>
                             </CareerRow>
                         ))}
@@ -33,18 +34,18 @@ const ProfileSection = () => {
                     <Group>
                         <GroupTitle>Award</GroupTitle>
                         <AwardList>
-                            {AWARDS.map(award => <li key={award}><NormalText>{award}</NormalText></li>)}
+                            {AWARDS.map(award => <li key={award.ko}><NormalText>{award[lang]}</NormalText></li>)}
                         </AwardList>
                     </Group>
                 </Groups>
             </InfoColumn>
 
             <SkillColumn>
-                <SkillBallBox ref={skillBoxRef}>
+                <SkillBox ref={skillBoxRef}>
                     {skillBoxSize && (
-                        <GravitySkillBalls skills={SKILLS} width={skillBoxSize.width} height={skillBoxSize.height} />
+                        <GravitySkillShapes skills={SKILLS} width={skillBoxSize.width} height={skillBoxSize.height} />
                     )}
-                </SkillBallBox>
+                </SkillBox>
             </SkillColumn>
         </Container>
     );
@@ -187,7 +188,7 @@ const SkillColumn = styled.div`
     }
 `;
 
-const SkillBallBox = styled.div`
+const SkillBox = styled.div`
     width: 100%;
     height: 100%;
     border: 1px solid #FFF;

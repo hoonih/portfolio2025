@@ -1,9 +1,11 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import styled from "styled-components";
+import { motion } from "framer-motion";
 import { CATEGORIES } from "../../../data/projectSchema.ts";
 import { mainPortfolioData, subPortfolioData, type Project } from "../../../data/projects.ts";
 import ProjectCard from "../components/ProjectCard.tsx";
 import { media } from "../../../styles/media.ts";
+import { useLanguage } from "../../../i18n/languageContext.ts";
 
 interface CategoryGroup {
     key: string;
@@ -19,6 +21,7 @@ const getHeaderHeight = () =>
     parseFloat(getComputedStyle(document.documentElement).getPropertyValue("--header-height")) || 0;
 
 const CategoryArchiveSection = ({ onSelect }: Props) => {
+    const { t } = useLanguage();
     const groups = useMemo<CategoryGroup[]>(() => {
         const all = [
             ...mainPortfolioData.map(project => ({ project, pinned: true })),
@@ -76,20 +79,6 @@ const CategoryArchiveSection = ({ onSelect }: Props) => {
 
     return (
         <Container>
-            <Sidebar ref={sidebarRef}>
-                {groups.map(({ key, label }) => (
-                    <GroupButton
-                        key={key}
-                        data-key={key}
-                        type="button"
-                        $active={key === activeKey}
-                        onClick={() => scrollToGroup(key)}
-                    >
-                        {label}
-                    </GroupButton>
-                ))}
-            </Sidebar>
-
             <Content>
                 {groups.map(({ key, label, items }) => (
                     <GroupSection key={key} ref={(el) => { sectionRefs.current[key] = el; }}>
@@ -102,6 +91,32 @@ const CategoryArchiveSection = ({ onSelect }: Props) => {
                     </GroupSection>
                 ))}
             </Content>
+
+            {/* 오른쪽에 고정된 목차. 현재 분류 표시가 스크롤을 따라 미끄러지듯 이동 */}
+            <Sidebar ref={sidebarRef} aria-label={t.portfolio.categories}>
+                {groups.map(({ key, label, items }) => {
+                    const active = key === activeKey;
+                    return (
+                        <GroupButton
+                            key={key}
+                            data-key={key}
+                            type="button"
+                            $active={active}
+                            aria-current={active ? "true" : undefined}
+                            onClick={() => scrollToGroup(key)}
+                        >
+                            {label}
+                            <Count>{String(items.length).padStart(2, "0")}</Count>
+                            {active && (
+                                <Indicator
+                                    layoutId="category-indicator"
+                                    transition={{ type: "spring", stiffness: 400, damping: 34 }}
+                                />
+                            )}
+                        </GroupButton>
+                    );
+                })}
+            </Sidebar>
         </Container>
     );
 };
@@ -111,11 +126,11 @@ export default CategoryArchiveSection;
 const Container = styled.section`
     display: flex;
     align-items: flex-start;
-    gap: 24px;
+    gap: 32px;
     padding: 32px 16px 80px;
 
     ${media.mobile} {
-        gap: 12px;
+        gap: 16px;
     }
     ${media.small} {
         flex-direction: column;
@@ -124,49 +139,83 @@ const Container = styled.section`
     }
 `;
 
+// 데스크톱: 오른쪽 세로 레일 (오른쪽 선 위를 흰 막대가 따라다님)
+// 작은 화면: 헤더 아래 가로 탭 (밑줄이 따라다님)
 const Sidebar = styled.nav`
     position: sticky;
-    top: calc(var(--header-height, 72px) + 16px);
+    top: calc(var(--header-height, 72px) + 24px);
     display: flex;
     flex-direction: column;
-    gap: 4px;
+    align-items: flex-end;
     flex-shrink: 0;
-    padding: 12px 16px 12px 8px;
-    border-radius: 12px;
-    background: #141414;
+    border-right: 1px solid #262626;
 
     ${media.small} {
+        order: -1;
         top: var(--header-height, 72px);
         z-index: 5;
         flex-direction: row;
-        gap: 16px;
-        padding: 12px 8px;
-        border-radius: 0;
+        align-items: stretch;
+        gap: 20px;
         margin: 0 -16px;
+        padding: 0 16px;
+        border-right: 0;
+        border-bottom: 1px solid #262626;
         background: #0A0A0A;
         overflow-x: auto;
     }
 `;
 
 const GroupButton = styled.button<{ $active: boolean }>`
-    padding: 2px 0 2px 8px;
+    position: relative;
+    display: flex;
+    align-items: baseline;
+    gap: 8px;
+    padding: 8px 16px 8px 0;
     border: 0;
-    border-left: 2px solid currentColor;
     background: none;
-    color: ${props => props.$active ? "#FFF" : "#3A3A3A"};
-    font-size: 18px;
+    color: ${props => props.$active ? "#FFF" : "#5A5A5A"};
+    font-size: 15px;
     font-weight: 600;
-    text-align: left;
+    text-align: right;
     white-space: nowrap;
     cursor: pointer;
     transition: color 0.2s ease;
 
     &:hover {
-        color: ${props => props.$active ? "#FFF" : "#7A7A7A"};
+        color: ${props => props.$active ? "#FFF" : "#9F9F9F"};
     }
 
-    ${media.mobile} {
-        font-size: 15px;
+    ${media.small} {
+        padding: 12px 0;
+        font-size: 14px;
+    }
+`;
+
+const Count = styled.span`
+    color: inherit;
+    opacity: 0.5;
+    font-size: 12px;
+    font-weight: 500;
+    font-variant-numeric: tabular-nums;
+`;
+
+const Indicator = styled(motion.span)`
+    position: absolute;
+    top: 0;
+    right: -1.5px;
+    bottom: 0;
+    width: 2px;
+    border-radius: 2px;
+    background: #FFF;
+
+    ${media.small} {
+        top: auto;
+        right: 0;
+        left: 0;
+        bottom: -1px;
+        width: auto;
+        height: 2px;
     }
 `;
 

@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from "react";
 import styled from "styled-components";
 import { getDocument, GlobalWorkerOptions, type PDFDocumentProxy, type RenderTask } from "pdfjs-dist";
 import workerUrl from "pdfjs-dist/build/pdf.worker.min.mjs?url";
+import { useLanguage } from "../../../i18n/languageContext.ts";
 
 GlobalWorkerOptions.workerSrc = workerUrl;
 
@@ -16,6 +17,7 @@ const PdfViewer = ({ url }: Props) => {
     const [ratio, setRatio] = useState(9 / 16); // 첫 페이지 기준 세로/가로 비율 (자리 잡기용)
     const [width, setWidth] = useState(0);
     const [error, setError] = useState(false);
+    const { t } = useLanguage();
 
     useEffect(() => {
         let cancelled = false;
@@ -46,8 +48,8 @@ const PdfViewer = ({ url }: Props) => {
 
     return (
         <Container ref={containerRef}>
-            {error && <Status>발표자료를 불러오지 못했어요.</Status>}
-            {!error && !doc && <Status>발표자료를 불러오는 중...</Status>}
+            {error && <Status>{t.portfolio.slidesError}</Status>}
+            {!error && !doc && <Status>{t.portfolio.loadingSlides}</Status>}
             {doc && width > 0 && Array.from({ length: doc.numPages }, (_, i) => (
                 <PdfPage key={i} doc={doc} pageNumber={i + 1} width={width} ratio={ratio} />
             ))}
@@ -70,6 +72,7 @@ const PdfPage = ({ doc, pageNumber, width, ratio }: PageProps) => {
     const canvasRef = useRef<HTMLCanvasElement>(null);
     const [visible, setVisible] = useState(false);
     const [rendered, setRendered] = useState(false);
+    const { t } = useLanguage();
 
     useEffect(() => {
         if (!wrapperRef.current) return;
@@ -111,7 +114,7 @@ const PdfPage = ({ doc, pageNumber, width, ratio }: PageProps) => {
 
     return (
         <PageWrapper ref={wrapperRef} style={{ aspectRatio: `1 / ${ratio}` }} $rendered={rendered}>
-            <canvas ref={canvasRef} aria-label={`${pageNumber}페이지`} />
+            <canvas ref={canvasRef} aria-label={t.portfolio.page(pageNumber)} />
         </PageWrapper>
     );
 };

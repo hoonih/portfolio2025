@@ -3,11 +3,11 @@ import { useLocation, useNavigate } from "react-router-dom";
 import styled, { keyframes } from "styled-components";
 import name from "../assets/name.svg";
 import { breakpoints, media } from "../styles/media.ts";
+import { useLanguage } from "../i18n/languageContext.ts";
 
 // name.svg의 원본 비율. 첫 진입 시 로고에 scaleY 애니메이션이 걸려 있어서
 // 실제 height를 재면 틀어지므로 너비 × 비율로 계산함
 const LOGO_RATIO = 87.34 / 1229;
-const VERTICAL_PADDING = 32; // LogoWrapper 상하 padding 합
 const STACK_GAP = 12;        // 태블릿 이하에서 로고와 메뉴 사이 간격
 
 const NAV_ITEMS = [
@@ -26,6 +26,7 @@ const Header = () => {
     const navigate = useNavigate();
     const { pathname } = useLocation();
     const active = getActive(pathname);
+    const { lang, setLang, t } = useLanguage();
     const headerRef = useRef<HTMLElement>(null);
     const logoRef = useRef<HTMLImageElement>(null);
     const navRef = useRef<HTMLDivElement>(null);
@@ -61,15 +62,19 @@ const Header = () => {
             logoHeightRef.current = logoHeight;
 
             // 태블릿 이하에서는 로고 아래로 메뉴가 내려가므로 메뉴 높이까지 포함
+            // 데스크톱은 로고와 메뉴가 나란히 있으므로 둘 중 큰 쪽
             const isStacked = window.innerWidth <= breakpoints.tablet;
             const navHeight = navRef.current?.offsetHeight ?? 0;
-            const contentHeight = isStacked ? logoHeight + STACK_GAP + navHeight : logoHeight;
-            document.documentElement.style.setProperty("--header-height", `${contentHeight + VERTICAL_PADDING}px`);
+            const contentHeight = isStacked ? logoHeight + STACK_GAP + navHeight : Math.max(logoHeight, navHeight);
+            const style = headerRef.current ? getComputedStyle(headerRef.current) : null;
+            const verticalPadding = style ? parseFloat(style.paddingTop) + parseFloat(style.paddingBottom) : 0;
+            document.documentElement.style.setProperty("--header-height", `${contentHeight + verticalPadding}px`);
 
             handleScroll();
         };
 
         measure();
+        document.fonts?.ready.then(measure); // 웹폰트가 늦게 적용되면 메뉴 높이가 바뀜
         window.addEventListener("resize", measure);
         return () => window.removeEventListener("resize", measure);
     }, []);
@@ -99,6 +104,16 @@ const Header = () => {
                         {label}
                     </TopBarButton>
                 ))}
+                <LangButton
+                    type="button"
+                    $select={false}
+                    aria-label={t.languageToggle}
+                    title={t.languageToggle}
+                    onClick={() => setLang(lang === "en" ? "ko" : "en")}
+                >
+                    <GlobeIcon />
+                    {lang.toUpperCase()}
+                </LangButton>
             </NavContainer>
             <ScrollProgress ref={progressRef} aria-hidden />
         </LogoWrapper>
@@ -118,7 +133,8 @@ const TopBarButton = styled.button<{ $select: boolean }>`
     border-radius: 16px;
     background: ${props => props.$select ? "#FFF" : "#191919"};
     color: ${props => props.$select ? "#191919" : "#FFF"};
-    font-size: 24px;
+    /* 화면 폭에 따라 커짐 — 480px: 약 17px, 1024px: 약 22px, 1920px 이상: 28px */
+    font-size: clamp(15px, 0.9vw + 13px, 28px);
     font-style: normal;
     font-weight: 600;
     line-height: normal;
@@ -132,16 +148,42 @@ const TopBarButton = styled.button<{ $select: boolean }>`
     }
 
     ${media.tablet} {
-        font-size: 18px;
         padding: 10px 8px;
         border-radius: 12px;
     }
     ${media.small} {
-        font-size: 14px;
         padding: 8px 6px;
         border-radius: 10px;
     }
 `;
+
+// 메뉴 버튼과 같은 스타일, 글자 대신 지구본 + 현재 언어만 표시해서 폭은 내용만큼
+const LangButton = styled(TopBarButton)`
+    flex: 0 0 auto;
+    gap: 6px;
+    padding-inline: 16px;
+
+    svg {
+        width: 1em;
+        height: 1em;
+        flex-shrink: 0;
+    }
+
+    ${media.tablet} {
+        padding-inline: 12px;
+    }
+    ${media.small} {
+        padding-inline: 10px;
+    }
+`;
+
+const GlobeIcon = () => (
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" aria-hidden>
+        <circle cx="12" cy="12" r="9.5" />
+        <path d="M2.5 12h19" />
+        <path d="M12 2.5c2.6 2.7 3.9 5.9 3.9 9.5s-1.3 6.8-3.9 9.5c-2.6-2.7-3.9-5.9-3.9-9.5s1.3-6.8 3.9-9.5z" />
+    </svg>
+);
 
 const NavContainer = styled.div`
     display: flex;

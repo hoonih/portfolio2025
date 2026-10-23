@@ -2,7 +2,8 @@ import { useEffect, useState } from "react";
 import { Link, useParams } from "react-router-dom";
 import styled from "styled-components";
 import MarkdownView from "../../components/MarkdownView.tsx";
-import { findPost } from "../../data/projects.ts";
+import { findPost, localizeProject } from "../../data/projects.ts";
+import { useLanguage } from "../../i18n/languageContext.ts";
 import { portfolioState } from "../portfolio/portfolioState.ts";
 import { formatDate } from "../../utils/format.ts";
 import { media } from "../../styles/media.ts";
@@ -13,6 +14,7 @@ const postBodies = import.meta.glob<string>("../../content/posts/*.md", { query:
 const PostPage = () => {
     const { slug = "" } = useParams();
     const found = findPost(slug);
+    const { lang, t } = useLanguage();
     const [loaded, setLoaded] = useState<{ slug: string; text: string } | null>(null);
     const loader = postBodies[`../../content/posts/${slug}.md`];
     // 본문 파일이 없으면 빈 글, 불러오는 중이면 null
@@ -40,24 +42,24 @@ const PostPage = () => {
                 {!found
                     ? (
                         <NotFound>
-                            <p>글을 찾을 수 없어요.</p>
-                            <BackLink to="/portfolio">← 포트폴리오로</BackLink>
+                            <p>{t.post.notFound}</p>
+                            <BackLink to="/portfolio">{t.post.backToPortfolio}</BackLink>
                         </NotFound>
                     )
                     : (
                         <>
                             <BackLink to="/portfolio" state={portfolioState(found.project.id, "posts")}>
-                                ← {found.project.title}
+                                ← {localizeProject(found.project, lang).title}
                             </BackLink>
                             <PostHeader>
                                 <Title>{found.post.title}</Title>
                                 {found.post.date && <PostDate>{formatDate(found.post.date)}</PostDate>}
                             </PostHeader>
                             {markdown === null
-                                ? <Status>불러오는 중...</Status>
+                                ? <Status>{t.post.loading}</Status>
                                 : markdown.trim()
                                     ? <MarkdownView markdown={markdown} />
-                                    : <Status>아직 본문이 없어요.</Status>}
+                                    : <Status>{t.post.empty}</Status>}
                         </>
                     )}
             </Main>
