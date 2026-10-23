@@ -1,6 +1,8 @@
-import styled, { keyframes } from "styled-components";
+import styled from "styled-components";
 import { motion } from "framer-motion";
-import arrowdown from "../../../assets/keyboard_arrow_down.svg";
+import { Link } from "react-router-dom";
+import arrowForward from "../../../assets/arrow_forward.svg";
+import {media} from "../../../styles/media.ts";
 
 const BannerSection = () => {
     return (
@@ -16,10 +18,12 @@ const BannerSection = () => {
                     웹앱 서비스로 구현하며 사람들의 일상 속에 자연스럽게 녹여냅니다.
                 </TitleText>
 
-                <ScrollGuide variants={itemVariants}>
-                    <ScrollText>아래의 포트폴리오를 구경해보세요</ScrollText>
-                    <img src={arrowdown} alt="arrowdown" width={24} height={24} />
-                </ScrollGuide>
+                <motion.div variants={itemVariants}>
+                    <PortfolioLink to="/portfolio">
+                        포트폴리오 보러가기
+                        <img src={arrowForward} alt="" width={20} height={20} />
+                    </PortfolioLink>
+                </motion.div>
             </Content>
         </Container>
     );
@@ -53,10 +57,16 @@ const itemVariants = {
 };
 
 const Container = styled.div`
-    width: 100vw;
+    width: 100%;
+    padding: 48px 16px;
     background-color: white;
     height: 36vh;
     min-height: 316px;
+
+    ${media.mobile} {
+        height: auto;
+        min-height: 240px;
+    }
     display: flex;
     justify-content: center;
     align-items: center;
@@ -74,26 +84,48 @@ const TitleText = styled(motion.h1)`
     text-align: center;
     font-size: 32px;
     font-weight: 600;
+    line-height: 1.4;
+    word-break: keep-all;
+
+    ${media.tablet} {
+        font-size: 26px;
+    }
+    ${media.mobile} {
+        font-size: 20px;
+
+        br {
+            display: none;
+        }
+    }
 `;
 
-const ScrollText = styled(motion.p)`
-    color: #afafaf;
-    text-align: center;
-    font-size: 14px;
-    font-weight: 500;
-`;
-
-const float = keyframes`
-    0% { transform: translateY(0); opacity: 0.8; }
-    50% { transform: translateY(8px); opacity: 1; }
-    100% { transform: translateY(0); opacity: 0.8; }
-`;
-
-const ScrollGuide = styled(motion.div)`
-    display: flex;
-    flex-direction: column;
+const PortfolioLink = styled(Link)`
+    display: inline-flex;
     align-items: center;
-    gap: 4px;
+    gap: 8px;
+    padding: 14px 28px;
+    border-radius: 999px;
+    background: #0A0A0A;
+    color: #FFF;
+    font-size: 18px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: transform 0.2s ease, background 0.2s ease;
 
-    animation: ${float} 2s ease-in-out infinite;
+    img {
+        transition: transform 0.2s ease;
+    }
+
+    &:hover {
+        background: #2A2A2A;
+
+        img {
+            transform: translateX(4px);
+        }
+    }
+
+    ${media.mobile} {
+        padding: 12px 22px;
+        font-size: 16px;
+    }
 `;

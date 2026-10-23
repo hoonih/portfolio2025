@@ -1,4 +1,5 @@
 import styled from "styled-components";
+import {media} from "../../styles/media.ts";
 
 const ConnectPage = () => {
     return (
@@ -15,14 +16,19 @@ export default ConnectPage;
 
 
 const Container = styled.div`
-    width: 100vw;
-    padding: 88px 0px;
+    width: 100%;
+    padding: 88px 16px;
     justify-content: center;
     display: flex;
     background: #FFF;
     align-items: center;
     flex-direction: column;
     gap: 15px;
+
+    ${media.mobile} {
+        padding: 56px 16px;
+        gap: 10px;
+    }
 `;
 
 const TitleText = styled.p`
@@ -32,7 +38,11 @@ const TitleText = styled.p`
     font-style: normal;
     font-weight: 600;
     line-height: normal;
-    
+    word-break: keep-all;
+
+    ${media.mobile} {
+        font-size: 22px;
+    }
 `
 
 const ContentText = styled.p`
@@ -42,4 +52,9 @@ const ContentText = styled.p`
     font-style: normal;
     font-weight: 600;
     line-height: normal;
+    word-break: break-all;
+
+    ${media.mobile} {
+        font-size: 16px;
+    }
 `;

@@ -19,6 +19,7 @@ const GravitySkillBalls = ({width, height} : Props) => {
             MouseConstraint,
             Runner,
             Events,
+            Query,
         } = Matter;
 
         const engine = Engine.create();
@@ -58,10 +59,13 @@ const GravitySkillBalls = ({width, height} : Props) => {
             { name: "Arduino", level: 8 },
         ];
 
+        // 컨테이너 너비에 맞춰 공 크기 조절 (데스크톱 기준 700px)
+        const scale = Math.min(1, Math.max(0.5, width / 700));
+
         const balls = skills.map((skill, index) => {
-            const radius = 14 + skill.level * 6;
+            const radius = (14 + skill.level * 6) * scale;
             return Bodies.circle(
-                80 + index * 70,
+                (width / (skills.length + 1)) * (index + 1),
                 40,
                 radius,
                 {
@@ -92,6 +96,34 @@ const GravitySkillBalls = ({width, height} : Props) => {
         World.add(engine.world, mouseConstraint);
         render.mouse = mouse;
 
+        // Matter.js 기본 리스너는 휠/터치 스크롤을 막으므로 교체
+        // 휠은 페이지 스크롤에 맡기고, 터치는 공을 잡았을 때만 드래그로 처리
+        const canvas = render.canvas;
+        canvas.removeEventListener("wheel", mouse.mousewheel);
+        canvas.removeEventListener("touchstart", mouse.mousedown);
+        canvas.removeEventListener("touchmove", mouse.mousemove);
+        canvas.removeEventListener("touchend", mouse.mouseup);
+
+        let touchDragging = false;
+        const onTouchStart = (event: TouchEvent) => {
+            const rect = canvas.getBoundingClientRect();
+            const touch = event.changedTouches[0];
+            const point = { x: touch.clientX - rect.left, y: touch.clientY - rect.top };
+            touchDragging = Query.point(balls, point).length > 0;
+            if (touchDragging) mouse.mousedown(event);
+        };
+        const onTouchMove = (event: TouchEvent) => {
+            if (touchDragging) mouse.mousemove(event);
+        };
+        const onTouchEnd = (event: TouchEvent) => {
+            if (!touchDragging) return;
+            mouse.mouseup(event);
+            touchDragging = false;
+        };
+        canvas.addEventListener("touchstart", onTouchStart, { passive: false });
+        canvas.addEventListener("touchmove", onTouchMove, { passive: false });
+        canvas.addEventListener("touchend", onTouchEnd, { passive: false });
+
         // 🔥 공 중앙 텍스트 렌더링
         Events.on(render, "afterRender", () => {
             const ctx = render.context;
@@ -104,9 +136,9 @@ const GravitySkillBalls = ({width, height} : Props) => {
                 const radius = ball.circleRadius || 20;
 
                 // 🔥 레벨이 클수록 글자도 커짐
-                const fontSize = Math.max(12, radius * 0.35);
+                const fontSize = Math.max(9, radius * 0.35 - 5);
 
-                ctx.font = `600 ${fontSize-5}px Pretendard, sans-serif`;
+                ctx.font = `600 ${fontSize}px Pretendard, sans-serif`;
 
                 ctx.fillText(
                     ball.label,
@@ -117,9 +149,14 @@ const GravitySkillBalls = ({width, height} : Props) => {
         });
 
         Render.run(render);
-        Runner.run(Runner.create(), engine);
+        const runner = Runner.create();
+        Runner.run(runner, engine);
 
         return () => {
+            canvas.removeEventListener("touchstart", onTouchStart);
+            canvas.removeEventListener("touchmove", onTouchMove);
+            canvas.removeEventListener("touchend", onTouchEnd);
+            Runner.stop(runner);
             Render.stop(render);
             World.clear(engine.world, false);
             Engine.clear(engine);
