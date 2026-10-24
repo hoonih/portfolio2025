@@ -13,7 +13,7 @@ interface Props {
     height: number;
 }
 
-const FILL_RATIO = 0.6; // 상자 넓이 중 도형이 차지할 비율 — 쌓였을 때 화면이 꽉 차 보이는 정도
+const FILL_RATIO = 0.5; // 상자 넓이 중 도형이 차지할 비율 — 쌓였을 때 화면이 꽉 차 보이는 정도
 const MIN_FONT = 9;
 const LINE_HEIGHT = 1.15;
 const FONT = (size: number) => `600 ${size}px Pretendard, sans-serif`;

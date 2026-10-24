@@ -9,6 +9,7 @@ import { useLanguage } from "../i18n/languageContext.ts";
 // 실제 height를 재면 틀어지므로 너비 × 비율로 계산함
 const LOGO_RATIO = 87.34 / 1229;
 const STACK_GAP = 12;        // 태블릿 이하에서 로고와 메뉴 사이 간격
+const HOVER_DURATION = 350;  // hover 시 로고 축소, 콘텐츠 이동 시간(ms)
 
 const NAV_ITEMS = [
     { key: "introduce", label: "INTRODUCE", to: "/" },
@@ -32,6 +33,10 @@ const Header = () => {
     const navRef = useRef<HTMLDivElement>(null);
     const progressRef = useRef<HTMLDivElement>(null);
     const logoHeightRef = useRef(0);
+    const navHeightRef = useRef(0);
+    const hoverRef = useRef(false);
+    const releaseHoverRef = useRef<(() => void) | null>(null);
+    const animTimerRef = useRef<number | undefined>(undefined);
 
     // 스크롤에 따라 로고 축소 + 헤더 아래 흰 라인으로 읽은 만큼 표시
     // 매 스크롤마다 리렌더하지 않도록 DOM을 직접 갱신
@@ -42,7 +47,15 @@ const Header = () => {
         if (logoRef.current) {
             // 모바일은 로고가 이미 작으므로 줄이지 않음
             const minHeight = window.innerWidth <= breakpoints.mobile ? logoHeight : logoHeight / 2;
-            logoRef.current.style.height = `${Math.min(logoHeight, Math.max(minHeight, logoHeight - scrollY))}px`;
+            const scrollHeight = Math.min(logoHeight, Math.max(minHeight, logoHeight - scrollY));
+            // 마우스를 올리고 있으면 스크롤과 상관없이 최소 크기로 줄여서 오른쪽 메뉴를 보여주고,
+            // 줄어든 만큼 페이지 콘텐츠도 --header-hover-shift로 끌어올림 (Layout에서 사용)
+            const height = hoverRef.current ? minHeight : scrollHeight;
+            logoRef.current.style.height = `${height}px`;
+            // 데스크톱 헤더 높이는 로고와 메뉴 중 큰 쪽이므로 메뉴 높이 아래로는 줄지 않음
+            const navHeight = navHeightRef.current;
+            const shift = Math.max(scrollHeight, navHeight) - Math.max(height, navHeight);
+            document.documentElement.style.setProperty("--header-hover-shift", `${shift}px`);
         }
 
         const maxScroll = document.documentElement.scrollHeight - window.innerHeight;
@@ -64,7 +77,13 @@ const Header = () => {
             // 태블릿 이하에서는 로고 아래로 메뉴가 내려가므로 메뉴 높이까지 포함
             // 데스크톱은 로고와 메뉴가 나란히 있으므로 둘 중 큰 쪽
             const isStacked = window.innerWidth <= breakpoints.tablet;
-            const navHeight = navRef.current?.offsetHeight ?? 0;
+            if (isStacked) hoverRef.current = false;
+            // 데스크톱에서는 메뉴가 로고 높이로 늘어나 있으므로 잠깐 늘어나지 않게 하고 원래 높이를 잼
+            const nav = navRef.current;
+            if (nav) nav.style.alignSelf = "flex-start";
+            const navHeight = nav?.offsetHeight ?? 0;
+            if (nav) nav.style.alignSelf = "";
+            navHeightRef.current = navHeight;
             const contentHeight = isStacked ? logoHeight + STACK_GAP + navHeight : Math.max(logoHeight, navHeight);
             const style = headerRef.current ? getComputedStyle(headerRef.current) : null;
             const verticalPadding = style ? parseFloat(style.paddingTop) + parseFloat(style.paddingBottom) : 0;
@@ -79,6 +98,43 @@ const Header = () => {
         return () => window.removeEventListener("resize", measure);
     }, []);
 
+    // 데스크톱(로고와 메뉴가 나란히 있을 때)에서만 동작. 터치 기기는 hover가 없으므로 제외
+    const setHover = (hovering: boolean) => {
+        if (hoverRef.current === hovering) return;
+        hoverRef.current = hovering;
+        // 스크롤 중에는 즉시 따라가야 하므로 hover로 바뀔 때만 잠깐 transition을 켬 (로고, 콘텐츠 모두)
+        const root = document.documentElement;
+        root.setAttribute("data-header-animating", "");
+        window.clearTimeout(animTimerRef.current);
+        animTimerRef.current = window.setTimeout(() => root.removeAttribute("data-header-animating"), HOVER_DURATION + 50);
+        handleScroll();
+    };
+
+    // 헤더가 줄어들면 커서가 헤더 밖에 놓이게 되어 mouseleave → 다시 커짐 → mouseenter가 반복되므로
+    // 해제는 원래(줄기 전) 헤더 영역을 벗어났을 때만 함
+    const handleMouseEnter = () => {
+        if (hoverRef.current) return;
+        if (window.innerWidth <= breakpoints.tablet || !window.matchMedia("(hover: hover)").matches) return;
+        const zoneBottom = headerRef.current?.getBoundingClientRect().bottom ?? 0;
+
+        const onMove = (e: MouseEvent) => {
+            if (e.clientY > zoneBottom) release();
+        };
+        const release = () => {
+            window.removeEventListener("mousemove", onMove);
+            document.documentElement.removeEventListener("mouseleave", release);
+            releaseHoverRef.current = null;
+            setHover(false);
+        };
+        window.addEventListener("mousemove", onMove);
+        document.documentElement.addEventListener("mouseleave", release); // 창 밖으로 나간 경우
+        releaseHoverRef.current = release;
+        setHover(true);
+    };
+
+    // 페이지 이동, 언마운트 시 hover 해제
+    useEffect(() => () => releaseHoverRef.current?.(), [pathname]);
+
     // 페이지가 바뀌면 문서 길이가 달라지므로 진행 라인도 다시 계산
     useEffect(() => {
         handleScroll();
@@ -87,7 +143,10 @@ const Header = () => {
     }, [pathname]);
 
     return (
-        <LogoWrapper ref={headerRef}>
+        <LogoWrapper
+            ref={headerRef}
+            onMouseEnter={handleMouseEnter}
+        >
             <AnimatedLogo src={name} alt="YeHoonHong" ref={logoRef}/>
             <NavContainer ref={navRef}>
                 {NAV_ITEMS.map(({ key, label, to }) => (
@@ -215,6 +274,8 @@ const LogoWrapper = styled.header`
     transform-origin: center bottom;
     transition: transform 0.1s linear;
     position: fixed;
+    top: 0;
+    left: 0;
     padding-top: 16px;
     padding-bottom: 16px;
     padding-left: 16px;
@@ -261,5 +322,9 @@ const squashStretch = keyframes`
 
 const AnimatedLogo = styled.img`
   transform-origin: center center;
+
+  html[data-header-animating] & {
+    transition: height ${HOVER_DURATION}ms cubic-bezier(0.22, 1, 0.36, 1);
+  }
   animation: ${squashStretch} 1s cubic-bezier(0.22, 1, 0.36, 1);
 `;
